@@ -8,19 +8,35 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var authVm: AuthViewModel
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
-        }
-        .padding()
+            Group {
+                switch authVm.authState {
+                case .notAuthenticated(let state):
+                    if state.rawValue == ViewState.signIn.rawValue {
+                        LoginView()
+                    } else if state.rawValue == ViewState.signUp.rawValue {
+                        RegistrationView()
+                    } else {
+                        InitialView()
+                    }
+                case .authenticated:
+                    CommonView()
+                case .none:
+                    InitialView()
+                }
+            }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
+    static let authVm = AuthViewModel()
+    
     static var previews: some View {
-        ContentView()
+        NavigationStack {
+            ContentView()
+        }
+        .environmentObject(authVm)
     }
 }
